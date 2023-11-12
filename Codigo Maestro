@@ -1,0 +1,87 @@
+// Ejemplo de codigo de comunicacion simplex con modulo max 485 para arduino, red de arduinos: 1 maestro y varios esclavos. 
+// Programa del maestro.    
+// Autor: Ing. Jhon Jaime Vaca Hincapie, Guia de clase comunicaciones industriales ETITC, Facultad de ingenieria electromecanica. 
+
+ 
+#include "GFButton.h"// incluir libreria para evitar rebotes y solo tener en cuenta el flanco de subida al pulsar un boton. 
+
+int Esclavo_1[3]={4,5,6};// con un vector se declaran los pines de entrada para dar orden al esclavo 1.
+int Esclavo_2[3]={7,8,9};// con un vector se declaran los pines de entrada para dar ordenes al esclavo 2.
+int recorredor_esclavos= 0; // variable iteractiva para usos en while y if que se requiernan.
+
+// Declaracion de objetos necesarios para la aplicacion de funciones y acciones de cada una
+ 
+//-------------------Variables esclavo 1-------------------------------------------------------------------//
+
+GFButton boton_verde_1(Esclavo_1[0]); // lectura  de pin y asignacion de nombre para verificacion de flanco
+GFButton boton_rojo_1(Esclavo_1[1]); // lectura  de pin y asignacion de nombre para verificacion de flanco
+GFButton boton_apagar_1(Esclavo_1[2]); // lectura  de pin y asignacion de nombre para verificacion de flanco
+
+//-------------------Variables esclavo 2----------------------------------------------------------------//
+
+GFButton boton_verde_2(Esclavo_2[0]); // lectura  de pin y asignacion de nombre para verificacion de flanco
+GFButton boton_rojo_2(Esclavo_2[1]); // lectura  de pin y asignacion de nombre para verificacion de flanco
+GFButton boton_apagar_2(Esclavo_2[2]); // lectura  de pin y asignacion de nombre para verificacion de flanco
+
+
+void setup() {
+
+while(recorredor_esclavos < 4)
+{
+   pinMode(Esclavo_1[recorredor_esclavos],INPUT);// se recorre el vector de las entradas para señales de esclavo 1, declarando todas las variables como entradas. 
+   pinMode(Esclavo_2[recorredor_esclavos],INPUT);// se recorre el vector de las entradas para señales de esclavo 2, declarando todas las variables como entradas. 
+   recorredor_esclavos = recorredor_esclavos+1;
+}
+//----------------------------------- Asignacion de funciones void para cada pulsador de ordenes esclavo 1-------------------------------
+boton_verde_1.setPressHandler(luz_verde_1);
+boton_rojo_1.setPressHandler(luz_roja_1);
+boton_apagar_1.setPressHandler(apagar_leds_1);
+
+//----------------------------------- Asignacion de funciones void para cada pulsador de ordenes esclavo 2-------------------------------
+boton_verde_2.setPressHandler(luz_verde_2);
+boton_rojo_2.setPressHandler(luz_roja_2);
+boton_apagar_2.setPressHandler(apagar_leds_2);
+
+
+Serial.begin(9600);
+}
+
+void loop() 
+{
+ boton_verde_1.process();
+ boton_rojo_1.process();
+ boton_apagar_1.process();
+ boton_verde_2.process();
+ boton_rojo_2.process();
+ boton_apagar_2.process();
+}
+
+void luz_verde_1(GFButton and btn)
+   {
+    Serial.print("1-LEDGON_");
+   }
+   
+void apagar_leds_1(GFButton and btn)
+   {
+    Serial.print("1-LEDOFF_");
+   }
+   
+void luz_roja_1(GFButton and btn)
+  {
+   Serial.print("1-LEDRON_");
+  }
+  
+void luz_verde_2(GFButton and btn)
+  {
+   Serial.print("2-LEDGON_");
+  }
+  
+void apagar_leds_2(GFButton and btn)
+ {
+   Serial.print("2-LEDOFF_");
+ }
+
+void luz_roja_2(GFButton and btn)
+ {
+   Serial.print("2-LEDRON_");
+ }
