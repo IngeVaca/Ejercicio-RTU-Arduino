@@ -1,0 +1,67 @@
+// Ejemplo de codigo de comunicacion simplex con modulo max 485 para arduino, red de arduinos: 1 maestro y varios esclavos.
+// Programa de esclavo.    
+// Autor: Ing. Jhon Jaime Vaca Hincapie, Guia de clase comunicaciones industriales ETITC, Facultad de ingenieria electromecanica. 
+
+String Palabra_control = "";// Definicion de variable en la que se almacena la palabra de control recibida desde el maestro
+bool Bit_parada=false;// bit que indica el final de la trama o palabra de control
+int led_verde=0;
+int led_rojo=0;
+
+void setup()
+{
+  pinMode(8,OUTPUT);
+  pinMode(9,OUTPUT);
+  Serial.begin(9600);
+  Palabra_control.reserve(200); // se indica la longitud maxima de la palabra de control. 
+}
+
+void loop() 
+{
+  if (Bit_parada)// se confirma si la palbra de control ya envio el caracter de bit de parada. 
+     { 
+      if (Palabra_control == "2-LEDGON_") // se confirma si la palabra de control cumple con alguna de las condiciones. 
+         {
+            led_verde=1; 
+         }
+      if (Palabra_control == "2-LEDOFF_")//se confirma si la palabra de control cumple con alguna de las condiciones.
+         {
+          led_verde=0;
+          led_rojo=0;  
+         }
+      if (Palabra_control == "2-LEDRON_")//se confirma si la palabra de control cumple con alguna de las condiciones.
+         {  
+          led_rojo=1;    
+         }   
+  
+      Palabra_control =""; // se limpia la memoria de la palabra de control ya que en esta linea de codigo ya se habra ejecutado la accion requerida. 
+      Bit_parada = false;// se alista al receptor para recibir otro mensaje. 
+     }
+         if (led_rojo == 1)
+         {  
+         digitalWrite(9,HIGH);   
+         }
+      if (led_verde == 1)
+         {  
+         digitalWrite(8,HIGH);   
+         delay(100);
+         digitalWrite(8,LOW);   
+         delay(100);
+         }   
+    if (led_rojo == 0 and led_verde == 0)
+         {  
+         digitalWrite(8,LOW); digitalWrite(9,LOW);   
+         }
+ }
+
+  void serialEvent() // funcion encargada de verificar que la transmision se esta llevando a cabo sin problemas
+ {
+      while(Serial.available()) // se confirma que haya comunicacion con el maestro.
+           {
+            char mensaje = (char)Serial.read(); // el mensaje recibido  por el puerto de comunicacion se almacena en la variable tipo char llamada mensaje 
+            Palabra_control += mensaje; // se almacenan los caracteres recibidos por el puerto en la variable de palabra de control. 
+            if(mensaje == '_') // el caracter especial '_' sirve como señal de final de trama
+              {
+                Bit_parada=true;   // se confirma el final de la trama
+              }
+           }
+ }
